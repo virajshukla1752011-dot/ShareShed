@@ -1,0 +1,2079 @@
+<!DOCTYPE html >
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShareShed | Neighborhood Borrow & Share Network</title>
+    <style>
+        /* Premium Design Token Systems */
+        :root {
+            /* Theme Independent Configurations */
+            --font-serif: 'Playfair Display', 'Georgia', serif;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            
+            /* Default Dark Luxury Theme Tokens */
+            --bg-base: #060c0a;
+            --surface-panel: rgba(14, 26, 23, 0.65);
+            --surface-card: rgba(255, 255, 255, 0.02);
+            --border-elegant: rgba(223, 183, 108, 0.14);
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --text-pure: #ffffff;
+            --text-primary: #e3e8e6;
+            --text-secondary: #90a19d;
+            --accent-gold: #dfb76c;
+            --accent-gold-deep: #b89353;
+            --accent-mint: #52cca3;
+            --accent-coral: #e66767;
+            --form-bg: #091210;
+            --gradient-blend: radial-gradient(circle at 0% 0%, rgba(223, 183, 108, 0.04) 0%, transparent 50%);
+            
+            /* Chatbot Context Dark Elements */
+            --chat-window-bg: #0e1a17;
+            --chat-msg-bot: rgba(223, 183, 108, 0.08);
+            --chat-text: #e3e8e6;
+        }
+
+        /* Light Gallery Theme Tokens */
+        [data-theme="light"] {
+            --bg-base: #f7f9f8;
+            --surface-panel: #ffffff;
+            --surface-card: #f0f4f2;
+            --border-elegant: rgba(184, 147, 83, 0.3);
+            --border-subtle: rgba(0, 0, 0, 0.06);
+            --text-pure: #0b1412;
+            --text-primary: #2c3a37;
+            --text-secondary: #5a6e6a;
+            --accent-gold: #b89353;
+            --accent-gold-deep: #8c6d35;
+            --accent-mint: #2bb381;
+            --accent-coral: #d44c4c;
+            --form-bg: #fdfefe;
+            --gradient-blend: radial-gradient(circle at 0% 0%, rgba(184, 147, 83, 0.03) 0%, transparent 50%);
+            
+            /* Chatbot Context Light Elements */
+            --chat-window-bg: #ffffff;
+            --chat-msg-bot: rgba(184, 147, 83, 0.1);
+            --chat-text: #2c3a37;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-sans);
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            background-image: var(--gradient-blend);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.65;
+            transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* =========================================
+           ADDON: LUXURY SPLASH SCREEN ANIMATION
+           ========================================= */
+        #shareshed-splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #060c0a;
+            background-image: radial-gradient(circle at 50% 50%, rgba(223, 183, 108, 0.06) 0%, transparent 60%);
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            pointer-events: auto;
+        }
+
+        [data-theme="light"] #shareshed-splash-screen {
+            background-color: #f7f9f8;
+            background-image: radial-gradient(circle at 50% 50%, rgba(184, 147, 83, 0.05) 0%, transparent 60%);
+        }
+
+        .splash-branding-cluster {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: premiumRevealSequence 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.3s;
+        }
+
+        .splash-line-abstract {
+            width: 0px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+            margin-bottom: 20px;
+            animation: lineExpandSequence 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .splash-brand-title {
+            font-family: var(--font-sans);
+            font-size: 38px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: #ffffff;
+            line-height: 1;
+        }
+
+        [data-theme="light"] .splash-brand-title {
+            color: #0b1412;
+        }
+
+        .splash-brand-tagline {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: var(--accent-gold);
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        @keyframes lineExpandSequence {
+            0% { width: 0vw; opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { width: 140px; opacity: 0.4; }
+        }
+
+        @keyframes premiumRevealSequence {
+            0% { transform: translateY(15px); opacity: 0; filter: blur(4px); }
+            100% { transform: translateY(0); opacity: 1; filter: blur(0); }
+        }
+
+        .ss-viewport-locked {
+            overflow: hidden !important;
+            height: 100vh !important;
+        }
+
+        /* Premium Top Navigation */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 6%;
+            background: var(--bg-base);
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: background-color 0.4s ease;
+        }
+
+        .logo-block {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-pure);
+        }
+
+        .logo-tag {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent-gold);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 10px 22px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-gold);
+            border-color: var(--accent-gold);
+        }
+
+        /* Classy Light / Dark Toggle Switch */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .theme-label-text {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .theme-switch {
+            display: inline-block;
+            height: 22px;
+            position: relative;
+            width: 44px;
+        }
+
+        .theme-switch input {
+            display: none;
+        }
+
+        .slider {
+            background-color: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            background-color: var(--accent-gold);
+            bottom: 3px;
+            content: "";
+            height: 14px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 14px;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent-gold);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+            background-color: var(--bg-base);
+        }
+
+        /* Layout Framework */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 50px 20px;
+        }
+
+        /* Editorial Hero Typography */
+        .hero {
+            text-align: center;
+            padding: 60px 20px 60px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero-meta {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--accent-gold);
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .hero h1 {
+            font-family: var(--font-serif);
+            font-size: 48px;
+            font-weight: 400;
+            line-height: 1.25;
+            margin-bottom: 28px;
+            color: var(--text-pure);
+        }
+
+        .hero .intro-bold {
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: 400;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .hero .intro-extended {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.75;
+            opacity: 0.9;
+        }
+
+        /* Classy Modular Container Panels */
+        .premium-panel {
+            background: var(--surface-panel);
+            border: 1px solid var(--border-elegant);
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.4s ease, border-color 0.4s ease;
+        }
+
+        h2 {
+            font-family: var(--font-serif);
+            font-size: 24px;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            margin-bottom: 30px;
+            color: var(--text-pure);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h2::after {
+            content: '';
+            flex-grow: 1;
+            height: 1px;
+            background: linear-gradient(to right, var(--border-elegant), transparent);
+        }
+
+        /* Category Grid System */
+        .categories-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 20px;
+        }
+
+        .category-node {
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 24px 20px;
+            transition: all 0.4s ease;
+        }
+
+        .category-node:hover {
+            border-color: var(--accent-gold);
+            transform: translateY(-2px);
+        }
+
+        .category-node h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-pure);
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .category-node p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Structural Grid Splits */
+        .split-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 40px;
+        }
+
+        /* Architectural Roadmap Nodes */
+        .roadmap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .roadmap-card {
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 24px;
+            position: relative;
+        }
+
+        .roadmap-num {
+            font-family: var(--font-serif);
+            font-size: 24px;
+            font-style: italic;
+            color: var(--accent-gold);
+            opacity: 0.5;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .roadmap-card h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-pure);
+            margin-bottom: 8px;
+        }
+
+        .roadmap-card p {
+            font-size: 12.5px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Trust List Framework */
+        .trust-paragraph {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .trust-list {
+            list-style: none;
+        }
+
+        .trust-list li {
+            position: relative;
+            padding-left: 24px;
+            margin-bottom: 14px;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .trust-list li::before {
+            content: '✦';
+            position: absolute;
+            left: 2px;
+            color: var(--accent-gold);
+            font-size: 11px;
+        }
+
+        /* Triple Impact Structural View */
+        .impact-framework {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .impact-node {
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 28px;
+        }
+
+        .impact-node h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent-gold);
+            margin-bottom: 10px;
+            letter-spacing: 0.3px;
+        }
+
+        .impact-node p {
+            font-size: 13.5px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Premium Form Styling */
+        .instruction-tip {
+            font-size: 13px;
+            color: var(--accent-gold);
+            margin-bottom: 28px;
+            background: var(--surface-card);
+            border: 1px solid var(--border-elegant);
+            padding: 12px 18px;
+            border-radius: 4px;
+            border-left: 2px solid var(--accent-gold);
+        }
+
+        .form-row-block {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .form-element {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-element label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .form-element input, 
+        .form-element select, 
+        .form-element textarea {
+            background: var(--form-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            padding: 14px 18px;
+            color: var(--text-pure);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-element input:focus, 
+        .form-element select:focus, 
+        .form-element textarea:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 1px var(--accent-gold);
+        }
+
+        .choice-container {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            height: 50px;
+        }
+
+        .choice-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        .choice-wrapper input {
+            accent-color: var(--accent-gold);
+            cursor: pointer;
+        }
+
+        /* Central Marketplace Board */
+        .board-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 16px;
+        }
+
+        .board-topbar h2 {
+            margin-bottom: 0;
+        }
+
+        .board-topbar h2::after {
+            display: none;
+        }
+
+        .board-feed {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+            gap: 28px;
+        }
+
+        .item-card-unit {
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .item-card-unit:hover {
+            border-color: var(--accent-gold);
+            transform: translateY(-2px);
+        }
+
+        .card-upper-block {
+            margin-bottom: 24px;
+        }
+
+        .meta-tag-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .indicator-pill {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 4px 10px;
+            border-radius: 3px;
+        }
+
+        .indicator-pill.offering {
+            background: rgba(82, 204, 163, 0.08);
+            color: var(--accent-mint);
+            border: 1px solid rgba(82, 204, 163, 0.2);
+        }
+
+        .indicator-pill.requesting {
+            background: rgba(230, 103, 103, 0.08);
+            color: var(--accent-coral);
+            border: 1px solid rgba(230, 103, 103, 0.2);
+        }
+
+        .classification-tag {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .item-card-unit h3 {
+            font-family: var(--font-serif);
+            font-size: 20px;
+            font-weight: 400;
+            color: var(--text-pure);
+            margin-bottom: 10px;
+        }
+
+        .item-card-unit p {
+            color: var(--text-secondary);
+            font-size: 13.5px;
+            line-height: 1.55;
+            font-style: italic;
+        }
+
+        .card-lower-block {
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .attribution-info {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .attribution-info span {
+            display: block;
+            color: var(--text-pure);
+            font-weight: 600;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+
+        /* Buttons Core Frame */
+        .action-button {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-button-gold {
+            background: var(--accent-gold);
+            color: var(--bg-base);
+            border: 1px solid var(--accent-gold);
+        }
+
+        .action-button-gold:hover {
+            background: var(--accent-gold-deep);
+            border-color: var(--accent-gold-deep);
+        }
+
+        .action-button-muted {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .action-button-muted:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: var(--text-secondary);
+        }
+
+        .action-button-critical {
+            background: transparent;
+            color: var(--accent-coral);
+            border: 1px solid rgba(230, 103, 103, 0.2);
+            font-size: 11px;
+            padding: 6px 14px;
+        }
+
+        .action-button-critical:hover {
+            background: var(--accent-coral);
+            color: #ffffff;
+            border-color: var(--accent-coral);
+        }
+
+        /* Financial Ledger Section */
+        .ledger-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .ledger-statement-panel {
+            background: linear-gradient(135deg, rgba(223, 183, 108, 0.04), transparent);
+            border: 1px solid var(--border-elegant);
+            border-radius: 8px;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .statement-label h4 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-pure);
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .statement-label p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .statement-numeric-output {
+            font-family: var(--font-serif);
+            font-size: 42px;
+            font-weight: 400;
+            color: var(--accent-gold);
+        }
+
+        .ledger-history-box {
+            margin-top: 10px;
+        }
+
+        .history-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .history-records {
+            list-style: none;
+            font-size: 13.5px;
+            color: var(--text-secondary);
+            border: 1px dashed var(--border-subtle);
+            border-radius: 6px;
+            padding: 18px;
+            background: rgba(0,0,0,0.02);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Premium Luxury Footer */
+        footer {
+            border-top: 1px solid var(--border-subtle);
+            background: var(--bg-base);
+            padding: 60px 20px 50px 20px;
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        .editorial-pledge {
+            font-family: var(--font-serif);
+            font-size: 18px;
+            font-style: italic;
+            color: var(--text-pure);
+            max-width: 700px;
+            margin: 0 auto 30px auto;
+            line-height: 1.7;
+            opacity: 0.85;
+        }
+
+        .founders-meta {
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .helpline-meta {
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        .editorial-copyright {
+            font-size: 11px;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* =========================================
+           INTEGRATED SHARESHED CHATBOT WIDGET STYLES 
+           ========================================= */
+        .ss-chat-launcher {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 56px;
+            height: 56px;
+            background-color: var(--accent-gold);
+            border-radius: 50%;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .ss-chat-launcher:hover {
+            transform: scale(1.06);
+        }
+        .ss-chat-launcher svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--bg-base);
+        }
+        .ss-chat-container {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 370px;
+            height: 500px;
+            background-color: var(--chat-window-bg);
+            border: 1px solid var(--border-elegant);
+            border-radius: 12px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 2000;
+            transition: background-color 0.4s ease;
+        }
+        .ss-chat-header {
+            background: linear-gradient(135deg, var(--surface-panel), var(--bg-base));
+            border-bottom: 1px solid var(--border-subtle);
+            color: var(--text-pure);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .ss-chat-header.complaint-active {
+            background: linear-gradient(135deg, rgba(230, 103, 103, 0.15), var(--bg-base));
+            border-bottom: 1px solid var(--accent-coral);
+        }
+        .ss-bot-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .ss-bot-avatar {
+            font-size: 20px;
+            width: 34px;
+            height: 34px;
+            background: rgba(223, 183, 108, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ss-bot-details h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-pure);
+        }
+        .ss-bot-details p {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+        .ss-close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 22px;
+            cursor: pointer;
+        }
+        .ss-close-btn:hover {
+            color: var(--accent-coral);
+        }
+        .ss-chat-body {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.1));
+        }
+        .ss-chat-msg {
+            max-width: 82%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--chat-text);
+        }
+        .ss-msg-bot {
+            background-color: var(--chat-msg-bot);
+            border: 1px solid var(--border-subtle);
+            align-self: flex-start;
+        }
+        .ss-msg-user {
+            background-color: var(--accent-gold);
+            color: var(--bg-base);
+            font-weight: 500;
+            align-self: flex-end;
+        }
+        .ss-chips-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .ss-chip {
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .ss-chip:hover {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+        .ss-chip.complaint-chip {
+            border-color: rgba(230, 103, 103, 0.4);
+            color: var(--accent-coral);
+        }
+        .ss-chip.complaint-chip:hover {
+            background: var(--accent-coral);
+            color: #ffffff;
+        }
+        .ss-chat-footer {
+            padding: 12px;
+            border-top: 1px solid var(--border-subtle);
+            display: flex;
+            gap: 8px;
+            background: var(--form-bg);
+        }
+        .ss-input-field {
+            flex: 1;
+            background: var(--bg-base);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            padding: 10px 14px;
+            color: var(--text-pure);
+            font-size: 13px;
+            outline: none;
+        }
+        .ss-input-field:focus {
+            border-color: var(--accent-gold);
+        }
+        .ss-submit-arrow {
+            background: var(--accent-gold);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ss-submit-arrow svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--bg-base);
+        }
+
+        /* =========================================
+           NEW SYSTEM: MODAL AUTH LAYOUT ELEMENTS 
+           ========================================= */
+        .auth-overlay-backdrop {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(6, 12, 10, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 3000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        .auth-overlay-backdrop.is-visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .auth-window-box {
+            background: #091210;
+            border: 1px solid var(--border-elegant);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.6);
+            transform: translateY(-20px);
+            transition: transform 0.4s ease;
+        }
+        [data-theme="light"] .auth-window-box {
+            background: #ffffff;
+        }
+        .auth-overlay-backdrop.is-visible .auth-window-box {
+            transform: translateY(0);
+        }
+        .auth-headline h3 {
+            font-family: var(--font-serif);
+            font-size: 24px;
+            color: var(--text-pure);
+            margin-bottom: 6px;
+        }
+        .auth-headline p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+        .auth-toggle-context {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-top: 20px;
+        }
+        .auth-toggle-context span {
+            color: var(--accent-gold);
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .auth-status-banner {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: none;
+            font-weight: 600;
+        }
+        .auth-status-banner.err {
+            background: rgba(230, 103, 103, 0.1);
+            color: var(--accent-coral);
+            border: 1px solid rgba(230, 103, 103, 0.2);
+        }
+        .auth-status-banner.succ {
+            background: rgba(82, 204, 163, 0.1);
+            color: var(--accent-mint);
+            border: 1px solid rgba(82, 204, 163, 0.2);
+        }
+
+        @media (max-width: 650px) {
+            header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            .nav-right {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .hero h1 {
+                font-size: 34px;
+            }
+            .split-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Addon Splash Screen Layer -->
+    <div id="shareshed-splash-screen">
+        <div class="splash-line-abstract"></div>
+        <div class="splash-branding-cluster">
+            <div class="splash-brand-title">ShareShed</div>
+            <div class="splash-brand-tagline">Borrow &bull; Lend &bull; Earn</div>
+        </div>
+    </div>
+
+    <!-- Top Navigation Bar -->
+    <header>
+        <div class="logo-block">
+            <div class="logo">ShareShed</div>
+            <div class="logo-tag">Borrow, Lend, Earn</div>
+        </div>
+        <div class="nav-right">
+            <nav class="nav-links">
+                <a href="#community-board">Open community board</a>
+                <a href="#earnings-tracker">Calculate earnings</a>
+                <!-- Login Status Dynamic Entry Anchor -->
+                <a href="javascript:void(0)" id="navAuthActionButton" onclick="handleAuthNavInteraction()" style="border-color: var(--accent-gold); color: var(--accent-gold);">Access Account</a>
+            </nav>
+            <!-- Light/Dark Mode Controls Container -->
+            <div class="theme-switch-wrapper">
+                <span class="theme-label-text" id="themeLabel">Light Mode</span>
+                <label class="theme-switch" for="checkbox">
+                    <input type="checkbox" id="checkbox" onchange="toggleTheme(this)">
+                    <div class="slider"></div>
+                </label>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Wrapper -->
+    <main>
+
+        <!-- Hero Intro Section -->
+        <section class="hero">
+            <div class="hero-meta">The Idea</div>
+            <h1>Borrowing should feel as normal as asking a neighbor for sugar.</h1>
+            <p class="intro-bold">A simple website idea where families in one colony can borrow useful things, share extra items, and waste less money.</p>
+            <p class="intro-extended">Neighborhoods thrive when people look out for one another. ShareShed brings structure to this timeless habit. Instead of investing in expensive, single-use items, residents can seamlessly see what tools, books, or gear are already available right down the lane. Designed perfectly for local housing societies, apartment complexes, or close-knit blocks, this network provides a simple layout to borrow securely, trade unused items, and forge real trust right where you live.</p>
+        </section>
+
+        <!-- Categories Ribbon Showcase -->
+        <section class="premium-panel">
+            <h2>Useful items that usually stay idle at home</h2>
+            <div class="categories-container">
+                <div class="category-node">
+                    <h3>Books</h3>
+                    <p>Story books, guide books, novels, old textbooks, and magazines.</p>
+                </div>
+                <div class="category-node">
+                    <h3>Tools</h3>
+                    <p>Drill machines, ladders, screwdrivers, measuring tapes, and tool kits.</p>
+                </div>
+                <div class="category-node">
+                    <h3>Games</h3>
+                    <p>Board games, chess sets, carrom boards, cards, and puzzles.</p>
+                </div>
+                <div class="category-node">
+                    <h3>Sports</h3>
+                    <p>Cricket bats, footballs, badminton rackets, skipping ropes, and cones.</p>
+                </div>
+                <div class="category-node">
+                    <h3>Festival Items</h3>
+                    <p>Decor lights, dandiya sticks, rangoli stencils, and small decorations.</p>
+                </div>
+                <div class="category-node">
+                    <h3>Plants</h3>
+                    <p>Extra pots, seeds, watering cans, garden tools, and plant cuttings.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Workflow and Trust Rules Grid Split -->
+        <div class="split-grid">
+            <!-- How it Works -->
+            <section class="premium-panel">
+                <div class="hero-meta" style="margin-bottom:8px;">How It Works</div>
+                <h2>A calm system for sharing without confusion</h2>
+                <div class="roadmap-grid">
+                    <div class="roadmap-card">
+                        <span class="roadmap-num">01</span>
+                        <h3>List an item</h3>
+                        <p>A neighbor adds an item they can lend, with a short note about condition and timing.</p>
+                    </div>
+                    <div class="roadmap-card">
+                        <span class="roadmap-num">02</span>
+                        <h3>Request politely</h3>
+                        <p>The borrower sends a request and mentions when they need it and when they will return it.</p>
+                    </div>
+                    <div class="roadmap-card">
+                        <span class="roadmap-num">03</span>
+                        <h3>Borrow with care</h3>
+                        <p>Both people agree on pickup, return date, and how the item should be handled.</p>
+                    </div>
+                    <div class="roadmap-card">
+                        <span class="roadmap-num">04</span>
+                        <h3>Return and thank</h3>
+                        <p>The item is returned clean and on time, making trust in the neighborhood stronger.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Trust Guidelines & Consequences -->
+            <section class="premium-panel">
+                <h2>Trust Rules</h2>
+                <p class="trust-paragraph">Simple rules make sharing safe. If guidelines are clear, everyone feels more comfortable using the network.</p>
+                <ul class="trust-list" style="margin-bottom: 25px;">
+                    <li>Write your real name and house or flat number.</li>
+                    <li>Return things on the promised date.</li>
+                    <li>Give back items clean and in the same condition.</li>
+                    <li>Ask an adult before borrowing costly items.</li>
+                    <li>If something breaks, inform the owner honestly.</li>
+                </ul>
+
+                <h3 style="font-size: 14px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent-coral); font-weight: 600; margin-bottom: 12px;">⚠️ Penalty Guidelines</h3>
+                <ul class="trust-list">
+                    <li style="color: var(--text-secondary);">Late Returns: A buffer of 24 hours is permitted, after which a convenience fee of Rs. 50 per day will be added to the resident's network ledger.</li>
+                    <li style="color: var(--text-secondary);">Negligent Damage: If an item is returned broken or missing essential parts due to poor handling, the borrower must cover the full repair cost or compensate the market buy-value.</li>
+                    <li style="color: var(--text-secondary);">Repeated Disregard: Borrowers receiving multiple flags or continuous complaints from item owners will face temporary suspension from claiming community board items.</li>
+                </ul>
+            </section>
+        </div>
+
+        <!-- Social Values Split System -->
+        <section class="premium-panel">
+            <div class="hero-meta" style="margin-bottom:8px;">Why It Matters</div>
+            <h2>Small sharing can make a big difference</h2>
+            <div class="impact-framework">
+                <div class="impact-node">
+                    <h3>Less buying</h3>
+                    <p>Items used only once do not need to be purchased by every family.</p>
+                </div>
+                <div class="impact-node">
+                    <h3>Less waste</h3>
+                    <p>Useful objects get a longer life instead of sitting forgotten in cupboards.</p>
+                </div>
+                <div class="impact-node">
+                    <h3>More connection</h3>
+                    <p>Neighbors talk more, help more, and feel more responsible for each other.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Listing Submission Form Section -->
+        <section class="premium-panel">
+            <h2>Try a ShareShed listing</h2>
+            <div class="instruction-tip">Step 1: Offer an item here. It will list below with a buy value, allowing neighbors to trade it and add money to the ledger!</div>
+            
+            <form id="newListingForm" onsubmit="event.preventDefault();">
+                <div class="form-row-block">
+                    <div class="form-element">
+                        <label>Your Name & Address *</label>
+                        <input type="text" id="listingUser" placeholder="Example: Aarav (Flat 402)" required>
+                    </div>
+                    <div class="form-element">
+                        <label>Item Name *</label>
+                        <input type="text" id="listingTitle" placeholder="Example: Carrom board" required>
+                    </div>
+                </div>
+                
+                <div class="form-row-block" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+                    <div class="form-element">
+                        <label>Category</label>
+                        <select id="listingCategory">
+                            <option>Books</option>
+                            <option>Tools</option>
+                            <option>Games</option>
+                            <option>Sports</option>
+                            <option>Festival</option>
+                            <option>Plants</option>
+                            <option>Others</option>
+                        </select>
+                    </div>
+                    <div class="form-element">
+                        <label>Value / Price (Rs.) *</label>
+                        <input type="number" id="listingPrice" value="100" required>
+                    </div>
+                    <div class="form-element">
+                        <label>Type</label>
+                        <div class="choice-container">
+                            <label class="choice-wrapper">
+                                <input type="radio" name="listing_type" value="Offering" checked> Offering
+                            </label>
+                            <label class="choice-wrapper">
+                                <input type="radio" name="listing_type" value="Requesting"> Requesting
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-element" style="margin-bottom: 30px;">
+                    <label>Short Note *</label>
+                    <textarea id="listingNote" rows="3" placeholder="Example: In clean condition, can trade or lend out." required></textarea>
+                </div>
+
+                <button type="submit" class="action-button action-button-gold" style="width: 100%; padding: 16px; font-size: 13px;">Add Listing to Board</button>
+            </form>
+        </section>
+
+        <!-- Central Community Board Display -->
+        <section class="premium-panel" id="community-board">
+            <div class="board-topbar">
+                <h2>Today in ShareShed</h2>
+                <button class="action-button action-button-critical" onclick="resetLedgerAndBoard()">Reset Everything</button>
+            </div>
+
+            <div class="board-feed" id="boardFeedContainer">
+                <!-- Item Card 1 -->
+                <div class="item-card-unit">
+                    <div class="card-upper-block">
+                        <div class="meta-tag-line">
+                            <span class="indicator-pill offering">Offering</span>
+                            <span class="classification-tag">Tools</span>
+                        </div>
+                        <h3>Extension Cord (15m)</h3>
+                        <p>"Heavy-duty extension reel. Perfect if you are doing balcony setups or DIY drill work."</p>
+                    </div>
+                    <div class="card-lower-block">
+                        <div class="attribution-info">By <span>Aarav (Flat 402)</span></div>
+                        <button class="action-button action-button-gold" onclick="processBoardPurchase(this, 'Extension Cord (15m)', 120)">Buy / Borrow (Rs. 120)</button>
+                    </div>
+                </div>
+
+                <!-- Item Card 2 -->
+                <div class="item-card-unit">
+                    <div class="card-upper-block">
+                        <div class="meta-tag-line">
+                            <span class="indicator-pill offering">Offering</span>
+                            <span class="classification-tag">Books</span>
+                        </div>
+                        <h3>Encyclopedia Box Set</h3>
+                        <p>"Beautiful illustrated set for kids. Can lend out or give away to any family."</p>
+                    </div>
+                    <div class="card-lower-block">
+                        <div class="attribution-info">By <span>Priya (House 14)</span></div>
+                        <button class="action-button action-button-gold" onclick="processBoardPurchase(this, 'Encyclopedia Box Set', 450)">Buy / Borrow (Rs. 450)</button>
+                    </div>
+                </div>
+
+                <!-- Item Card 3 -->
+                <div class="item-card-unit">
+                    <div class="card-upper-block">
+                        <div class="meta-tag-line">
+                            <span class="indicator-pill requesting">Requesting</span>
+                            <span class="classification-tag">Sports</span>
+                        </div>
+                        <h3>Badminton Rackets</h3>
+                        <p>"Looking for a pair of rackets for this weekend's evening match with kids."</p>
+                    </div>
+                    <div class="card-lower-block">
+                        <div class="attribution-info">By <span>Kabir (Flat 105)</span></div>
+                        <button class="action-button action-button-muted" style="font-size:10px; padding: 10px 14px;">Awaiting fulfillment offer</button>
+                    </div>
+                </div>
+
+                <!-- Item Card 4 -->
+                <div class="item-card-unit">
+                    <div class="card-upper-block">
+                        <div class="meta-tag-line">
+                            <span class="indicator-pill requesting">Requesting</span>
+                            <span class="classification-tag">Tools</span>
+                        </div>
+                        <h3>Electric Drill Machine</h3>
+                        <p>"Need a drill machine for just 1 hour to mount two photo frames in the bedroom."</p>
+                    </div>
+                    <div class="card-lower-block">
+                        <div class="attribution-info">By <span>Meera (House 38)</span></div>
+                        <button class="action-button action-button-muted" style="font-size:10px; padding: 10px 14px;">Awaiting fulfillment offer</button>
+                    </div>
+                </div>
+
+                <!-- Item Card 5 -->
+                <div class="item-card-unit">
+                    <div class="card-upper-block">
+                        <div class="meta-tag-line">
+                            <span class="indicator-pill offering">Offering</span>
+                            <span class="classification-tag">Games</span>
+                        </div>
+                        <h3>Catan Board Game</h3>
+                        <p>"Great strategy game for weekend family nights. Has all tokens inside."</p>
+                    </div>
+                    <div class="card-lower-block">
+                        <div class="attribution-info">By <span>Rohan (Flat 501)</span></div>
+                        <button class="action-button action-button-gold" onclick="processBoardPurchase(this, 'Catan Board Game', 250)">Buy / Borrow (Rs. 250)</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Earnings Tracker Architecture -->
+        <section class="premium-panel" id="earnings-tracker">
+            <h2>Track Money Earned</h2>
+            <div class="instruction-tip" style="background: rgba(82, 204, 163, 0.02); border-color: var(--accent-mint);">
+                Step 2: Money is updated automatically when you buy an item from the board above, or you can add manual transaction adjustments here.
+            </div>
+
+            <div class="ledger-wrapper">
+                <form id="manualEarningForm" onsubmit="event.preventDefault(); handleManualEarningSubmit();">
+                    <div class="form-row-block" style="grid-template-columns: 2fr 1fr 1fr auto; align-items: flex-end;">
+                        <div class="form-element">
+                            <label>Item Name *</label>
+                            <input type="text" id="manualItemName" placeholder="Example: Old story book" required>
+                        </div>
+                        <div class="form-element">
+                            <label>Price (Rs.) *</label>
+                            <input type="number" id="manualPrice" placeholder="120" required>
+                        </div>
+                        <div class="form-element">
+                            <label>Quantity *</label>
+                            <input type="number" id="manualQuantity" value="1" required>
+                        </div>
+                        <button type="submit" class="action-button action-button-muted" style="height: 50px; padding: 0 24px;">Add Manual Earning</button>
+                    </div>
+                </form>
+
+                <div class="ledger-statement-panel">
+                    <div class="statement-label">
+                        <h4>Total Community Earnings</h4>
+                        <p>Calculated directly from processed transactions above.</p>
+                    </div>
+                    <div class="statement-numeric-output" id="ledgerTotalDisplay">Rs. 0</div>
+                </div>
+
+                <div class="ledger-history-box">
+                    <div class="history-label">Sold / Transacted Items Ledger</div>
+                    <ul class="history-records" id="ledgerHistoryContainer">
+                        <li id="emptyLedgerPlaceholder">No transacted items yet. Click Buy on a board item above!</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Luxe Footer Section -->
+    <footer>
+        <div class="editorial-pledge">
+            "I believe a neighborhood becomes better when people share responsibly. ShareShed is my idea for a cleaner, kinder, and more connected community."
+        </div>
+        <div class="founders-meta">
+            Founder: Viraj Shukla
+        </div>
+        <div class="helpline-meta">
+            Helpline Number: +91 7290803654
+        </div>
+        <div class="editorial-copyright">
+            &copy; 2026 ShareShed &bull; Neighborhood Borrow & Share Network
+        </div>
+    </footer>
+
+    <!-- =============================================
+       INTEGRATED SHARESHED CHATBOT WIDGET INTERFACE 
+       ============================================= -->
+    <div class="ss-chat-launcher" onclick="toggleShedChat()">
+        <svg viewBox="0 0 24 24">
+            <path d="M20,2H4C2.9,2,2,2.9,2,4v18l4-4h14c1.1,0,2,-0.9,2,-2V4C22,2.9,21,2,20,2z M20,16H5.2L4,17.2V4h16V16z"/>
+        </svg>
+    </div>
+
+    <div class="ss-chat-container" id="shedChatContainer">
+        <div class="ss-chat-header" id="shedChatHeader">
+            <div class="ss-bot-profile">
+                <div class="ss-bot-avatar" id="shedBotAvatar">🏡</div>
+                <div class="ss-bot-details">
+                    <h4 id="shedBotName">ShedBuddy Help</h4>
+                    <p id="shedBotSubtext">Colony Network Assistant</p>
+                </div>
+            </div>
+            <button class="ss-close-btn" onclick="toggleShedChat()">&times;</button>
+        </div>
+
+        <div class="ss-chat-body" id="shedChatBody"></div>
+
+        <div class="ss-chat-footer">
+            <input type="text" class="ss-input-field" id="shedChatInput" placeholder="Ask a question or file complaint..." onkeypress="handleShedKeyPress(event)">
+            <button class="ss-submit-arrow" onclick="sendShedMessage()">
+                <svg viewBox="0 0 24 24"><path d="M2,21L23,12L2,3V10L17,12L2,14V21Z"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- =============================================
+       NEW OVERLAY PANEL SYSTEM: PREMIUM DIALOG HOOKS
+       ============================================= -->
+    <div class="auth-overlay-backdrop" id="authBackdrop" onclick="closeAuthModalOverlay(event)">
+        <div class="auth-window-box" id="authModalContent">
+            <div class="auth-headline">
+                <h3 id="authPanelTitle">Colony Login</h3>
+                <p id="authPanelSubtitle">Verify your flat location configuration</p>
+            </div>
+            <div class="auth-status-banner" id="authStatusAlert"></div>
+            <form id="colonyAuthForm" onsubmit="executeAuthSubmission(event)">
+                <div class="form-element" style="margin-bottom: 16px;">
+                    <label>Resident Address ID *</label>
+                    <input type="text" id="authAddressField" placeholder="e.g., Flat 402 or House 14" required>
+                </div>
+                <div class="form-element" style="margin-bottom: 24px;">
+                    <label>Colony Network Passcode *</label>
+                    <input type="password" id="authPasscodeField" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="action-button action-button-gold" style="width:100%; padding: 14px;" id="authSubmitButton">Verify Credentials</button>
+            </form>
+            <div class="auth-toggle-context" id="authToggleMessage">
+                New to the block? <span onclick="switchAuthMode('register')">Register Flat Profile</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theme Control Logic Script Hook -->
+    <script>
+        /* ========================================================
+           ADDON EXECUTION: SPLASH SCREEN LIFE CYCLE LIFTOFF
+           ======================================================== */
+        document.addEventListener("DOMContentLoaded", function() {
+            document.body.classList.add('ss-viewport-locked');
+            
+            const systemThemeCheckbox = document.getElementById('checkbox');
+            if (systemThemeCheckbox && systemThemeCheckbox.checked) {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+
+            window.addEventListener("load", function() {
+                setTimeout(function() {
+                    const splashScreenNode = document.getElementById('shareshed-splash-screen');
+                    if (splashScreenNode) {
+                        splashScreenNode.style.opacity = '0';
+                        splashScreenNode.style.transform = 'scale(1.02)';
+                        splashScreenNode.style.pointerEvents = 'none';
+                        
+                        document.body.classList.remove('ss-viewport-locked');
+                        
+                        setTimeout(() => {
+                            splashScreenNode.remove();
+                        }, 800);
+                    }
+                }, 1800);
+            });
+        });
+
+        function toggleTheme(toggleElement) {
+            const labelNode = document.getElementById('themeLabel');
+            if (toggleElement.checked) {
+                document.documentElement.setAttribute('data-theme', 'light');
+                if (labelNode) labelNode.textContent = "Dark Mode";
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                if (labelNode) labelNode.textContent = "Light Mode";
+            }
+        }
+
+        /* ========================================================
+           NEW: AUTOMATIC TRANSACTION LEDGER & FORM HANDLING LOGIC 
+           ======================================================== */
+        let runningTotalEarnings = 0;
+
+        function addTransactionToLedger(itemName, computedAmount) {
+            const historyContainer = document.getElementById('ledgerHistoryContainer');
+            const placeholder = document.getElementById('emptyLedgerPlaceholder');
+            
+            if (placeholder) {
+                placeholder.remove();
+            }
+
+            runningTotalEarnings += computedAmount;
+            document.getElementById('ledgerTotalDisplay').innerText = `Rs. ${runningTotalEarnings}`;
+
+            const transactionRow = document.createElement('li');
+            transactionRow.style.padding = "6px 0";
+            transactionRow.style.borderBottom = "1px solid var(--border-subtle)";
+            transactionRow.innerHTML = `✨ <strong>${itemName}</strong> transacted successfully — added <span style="color: var(--accent-mint); font-weight:600;">Rs. ${computedAmount}</span> to community pool.`;
+            historyContainer.appendChild(transactionRow);
+        }
+
+        function processBoardPurchase(btnRef, itemName, priceValue) {
+            // New verification guard rails hooked directly into system state
+            if (!activeColonyUserSession) {
+                triggerAuthModalDisplay();
+                displayAuthStatusAlert("Identification verification needed before continuous trade engagement.", "err");
+                return;
+            }
+            addTransactionToLedger(itemName, Number(priceValue));
+            
+            btnRef.innerText = "✓ Processed";
+            btnRef.disabled = true;
+            btnRef.className = "action-button action-button-muted";
+            btnRef.style.cursor = "default";
+        }
+
+        function handleManualEarningSubmit() {
+            if (!activeColonyUserSession) {
+                triggerAuthModalDisplay();
+                displayAuthStatusAlert("Identification verification needed before running ledger logs.", "err");
+                return;
+            }
+            const nameInput = document.getElementById('manualItemName');
+            const priceInput = document.getElementById('manualPrice');
+            const qtyInput = document.getElementById('manualQuantity');
+
+            const itemTitle = nameInput.value.trim();
+            const numericalPrice = Number(priceInput.value);
+            const totalQty = Number(qtyInput.value);
+            const totalTransactionCost = numericalPrice * totalQty;
+
+            addTransactionToLedger(`${itemTitle} (x${totalQty})`, totalTransactionCost);
+
+            nameInput.value = '';
+            priceInput.value = '';
+            qtyInput.value = '1';
+        }
+
+        // Connect Form submission wrapper for custom Dynamic Cards
+        document.getElementById('newListingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!activeColonyUserSession) {
+                triggerAuthModalDisplay();
+                displayAuthStatusAlert("Identification verification needed before continuous item listing declarations.", "err");
+                return;
+            }
+            const creator = document.getElementById('listingUser').value.trim();
+            const title = document.getElementById('listingTitle').value.trim();
+            const category = document.getElementById('listingCategory').value;
+            const price = Number(document.getElementById('listingPrice').value);
+            const note = document.getElementById('listingNote').value.trim();
+            const chosenType = document.querySelector('input[name="listing_type"]:checked').value;
+
+            const boardFeed = document.getElementById('boardFeedContainer');
+            const newCard = document.createElement('div');
+            newCard.className = 'item-card-unit';
+
+            let pillClass = chosenType.toLowerCase() === 'offering' ? 'offering' : 'requesting';
+            let buttonHTML = chosenType.toLowerCase() === 'offering' 
+                ? `<button class="action-button action-button-gold" onclick="processBoardPurchase(this, '${title}', ${price})">Buy / Borrow (Rs. ${price})</button>`
+                : `<button class="action-button action-button-muted" style="font-size:10px; padding: 10px 14px;">Awaiting fulfillment offer</button>`;
+
+            newCard.innerHTML = `
+                <div class="card-upper-block">
+                    <div class="meta-tag-line">
+                        <span class="indicator-pill ${pillClass}">${chosenType}</span>
+                        <span class="classification-tag">${category}</span>
+                    </div>
+                    <h3>${title}</h3>
+                    <p>"${note}"</p>
+                </div>
+                <div class="card-lower-block">
+                    <div class="attribution-info">By <span>${creator}</span></div>
+                    ${buttonHTML}
+                </div>
+            `;
+
+            boardFeed.insertBefore(newCard, boardFeed.firstChild);
+            this.reset();
+            document.getElementById('listingPrice').value = '100';
+            populateAutofillAddressFields();
+        });
+
+        function resetLedgerAndBoard() {
+            runningTotalEarnings = 0;
+            document.getElementById('ledgerTotalDisplay').innerText = "Rs. 0";
+            
+            const historyContainer = document.getElementById('ledgerHistoryContainer');
+            historyContainer.innerHTML = `<li id="emptyLedgerPlaceholder">No transacted items yet. Click Buy on a board item above!</li>`;
+            
+            // Reactivate hardcoded structural interaction buttons
+            const structuralButtons = document.querySelectorAll('#boardFeedContainer .action-button-muted');
+            structuralButtons.forEach(btn => {
+                if(btn.innerText === "✓ PROCESSED" || btn.innerText === "✓ Settled" || btn.innerText === "🕒 Escrow Active") {
+                    btn.className = "action-button action-button-gold";
+                    btn.disabled = false;
+                    btn.style.cursor = "pointer";
+                    // Re-apply correct dynamic text label match context
+                    if(btn.parentNode.previousElementSibling.querySelector('h3').innerText.includes("Extension")) {
+                        btn.innerText = "Buy / Borrow (Rs. 120)";
+                    } else if(btn.parentNode.previousElementSibling.querySelector('h3').innerText.includes("Encyclopedia")) {
+                        btn.innerText = "Buy / Borrow (Rs. 450)";
+                    } else {
+                        btn.innerText = "Buy / Borrow (Rs. 250)";
+                    }
+                }
+            });
+        }
+
+        /* =========================================
+           INTEGRATED SHARESHED CHATBOT LOGIC ENGINE 
+           ========================================= */
+        const shedChatContainer = document.getElementById('shedChatContainer');
+        const shedChatBody = document.getElementById('shedChatBody');
+        const shedChatInput = document.getElementById('shedChatInput');
+        const shedChatHeader = document.getElementById('shedChatHeader');
+        const shedBotName = document.getElementById('shedBotName');
+        const shedBotSubtext = document.getElementById('shedBotSubtext');
+        const shedBotAvatar = document.getElementById('shedBotAvatar');
+
+        let shedComplaintMode = false;
+        let shedComplaintStep = 0;
+        let shedComplaintData = { address: '', detail: '' };
+
+        const SHED_KNOWLEDGE_BASE = {
+            "how to borrow": "To borrow an item, explore the 'Today in ShareShed' board. Click on the gold button 'Buy / Borrow (Rs. XXX)' of any available listing. The payment will automatically add to the collective community total ledger calculations below!",
+            "add listing": "To place an item up for grabs, head to the 'Try a ShareShed listing' form block. Specify your local flat details, category classification, pricing, write a short description, and hit 'Add Listing to Board'.",
+            "trust guidelines": "Our ecosystem runs on clear trust parameters! Always state your authentic flat identity, return clean shared items precisely on the schedule promised, and verify guidelines with an adult for premium tools.",
+            "earnings info": "Your total shared financial records are logged instantly inside the 'Track Money Earned' dashboard panel. Transactions trigger update indicators dynamically whenever neighbors accept offering boards."
+        };
+
+        function toggleShedChat() {
+            if (shedChatContainer.style.display === 'flex') {
+                shedChatContainer.style.display = 'none';
+            } else {
+                shedChatContainer.style.display = 'flex';
+                if (shedChatBody.children.length === 0) {
+                    displayShedWelcome();
+                }
+            }
+        }
+
+        function appendShedMessage(messageText, senderType) {
+            const containerNode = document.createElement('div');
+            containerNode.classList.add('ss-chat-msg', senderType === 'user' ? 'ss-msg-user' : 'ss-msg-bot');
+            containerNode.innerText = messageText;
+            shedChatBody.appendChild(containerNode);
+            shedChatBody.scrollTop = shedChatBody.scrollHeight;
+        }
+
+        function displayShedWelcome() {
+            appendShedMessage("Hello neighbor! 👋 I'm ShedBuddy, your local colony coordinator. Select an option below or type any question regarding our sharing protocols.", "bot");
+            renderShedChips();
+        }
+
+        function renderShedChips() {
+            const chipsWrapper = document.createElement('div');
+            chipsWrapper.classList.add('ss-chips-layout');
+            chipsWrapper.innerHTML = `
+                <button class="ss-chip" onclick="triggerShedChip('How to Borrow')">🤝 How to Borrow</button>
+                <button class="ss-chip" onclick="triggerShedChip('Add Listing')">➕ Add Listing</button>
+                <button class="ss-chip" onclick="triggerShedChip('Trust Guidelines')">📜 Trust Guidelines</button>
+                <button class="ss-chip complaint-chip" onclick="initiateShedComplaint()">⚠️ Open Complaint Box</button>
+            `;
+            shedChatBody.appendChild(chipsWrapper);
+            shedChatBody.scrollTop = shedChatBody.scrollHeight;
+        }
+
+        function triggerShedChip(chipValue) {
+            appendShedMessage(chipValue, 'user');
+            const targetKey = chipValue.toLowerCase();
+            setTimeout(() => {
+                if (SHED_KNOWLEDGE_BASE[targetKey]) {
+                    appendShedMessage(SHED_KNOWLEDGE_BASE[targetKey], 'bot');
+                    renderReturnChips();
+                }
+            }, 500);
+        }
+
+        /* DYNAMIC COLONY COMPLAINT BOX PIPELINE */
+        function initiateShedComplaint() {
+            shedComplaintMode = true;
+            shedComplaintStep = 1;
+            
+            shedChatHeader.classList.add('complaint-active');
+            shedBotName.innerText = "Colony Grievance Box";
+            shedBotSubtext.innerText = "Secure Neighborhood Registry";
+            shedBotAvatar.innerText = "📝";
+
+            appendShedMessage("You have accessed the ShareShed Complaint Box. I will assist you in logging an official grievance for the committee review.", "bot");
+            setTimeout(() => {
+                appendShedMessage("Please specify your House / Flat Identity Number:", "bot");
+            }, 600);
+        }
+
+        function processShedComplaintFlow(userInputText) {
+            if (shedComplaintStep === 1) {
+                shedComplaintData.address = userInputText;
+                shedComplaintStep = 2;
+                appendShedMessage(`Logged under address context: ${shedComplaintData.address}. Now, describe your grievance explicitly (e.g., damaged tools, late return tracking, transaction mismatches):`, 'bot');
+            } else if (shedComplaintStep === 2) {
+                shedComplaintData.detail = userInputText;
+                const dynamicTicketNum = "SS-TKT-" + Math.floor(200000 + Math.random() * 700000);
+                
+                appendShedMessage("Saving tracking logs to colony ledger database...", "bot");
+                
+                setTimeout(() => {
+                    appendShedMessage(`✅ Complaint Filed Successfully!\n\nTicket Number: ${dynamicTicketNum}\nResident Address: ${shedComplaintData.address}\nGrievance Details: "${shedComplaintData.detail}"\n\n Our local building admins will investigate within 24 hours.`, 'bot');
+                    closeShedComplaintBox();
+                }, 1200);
+            }
+        }
+
+        function closeShedComplaintBox() {
+            shedComplaintMode = false;
+            shedComplaintStep = 0;
+            setTimeout(() => {
+                shedChatHeader.classList.remove('complaint-active');
+                shedBotName.innerText = "ShedBuddy Help";
+                shedBotSubtext.innerText = "Colony Network Assistant";
+                shedBotAvatar.innerText = "🏡";
+                renderReturnChips();
+            }, 2500);
+        }
+
+        function sendShedMessage() {
+            const rawValue = shedChatInput.value.trim();
+            if (!rawValue) return;
+
+            appendShedMessage(rawValue, 'user');
+            shedChatInput.value = '';
+
+            setTimeout(() => {
+                if (shedComplaintMode) {
+                    processShedComplaintFlow(rawValue);
+                } else {
+                    let matchedAnswer = false;
+                    for (let topicKey in SHED_KNOWLEDGE_BASE) {
+                        if (rawValue.toLowerCase().includes(topicKey)) {
+                            appendShedMessage(SHED_KNOWLEDGE_BASE[topicKey], 'bot');
+                            matchedAnswer = true;
+                            renderReturnChips();
+                            break;
+                        }
+                    }
+                    if (!matchedAnswer) {
+                        appendShedMessage("I didn't quite capture that query. Use our fast navigation buttons below or log your dispute directly into the official grievance layout.", "bot");
+                        renderReturnChips();
+                    }
+                }
+            }, 600);
+        }
+
+        function renderReturnChips() {
+            const backContainer = document.createElement('div');
+            backContainer.classList.add('ss-chips-layout');
+            backContainer.innerHTML = `
+                <button class="ss-chip" onclick="appendShedMessage('Main Panel Options','user'); setTimeout(()=>renderShedChips(),400)">🏠 Main Options</button>
+                <button class="ss-chip complaint-chip" onclick="initiateShedComplaint()">⚠️ File a Complaint</button>
+            `;
+            shedChatBody.appendChild(backContainer);
+            shedChatBody.scrollTop = shedChatBody.scrollHeight;
+        }
+
+        function handleShedKeyPress(eventObj) {
+            if (eventObj.key === 'Enter') {
+                sendShedMessage();
+            }
+        }
+
+        /* ========================================================
+           ADDON: REALISTIC DIGITAL TRANSACTION STATE ENGINE 
+           ======================================================== */
+        (function injectRealLifeTransactionSystems() {
+            // Overwrite original function to manage advanced state simulation phases
+            window.addTransactionToLedger = function(itemName, computedAmount) {
+                const historyContainer = document.getElementById('ledgerHistoryContainer');
+                const placeholder = document.getElementById('emptyLedgerPlaceholder');
+                
+                if (placeholder) { placeholder.remove(); }
+
+                const txId = 'TXN-' + Math.floor(100000 + Math.random() * 900000);
+                const timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+                
+                // Construct a realistic layout template for execution tracking
+                const txRow = document.createElement('li');
+                txRow.id = `tx-row-${txId}`;
+                txRow.style.padding = "12px";
+                txRow.style.marginBottom = "8px";
+                txRow.style.borderRadius = "6px";
+                txRow.style.background = "rgba(255,255,255,0.01)";
+                txRow.style.border = "1px solid var(--border-subtle)";
+                txRow.style.display = "flex";
+                txRow.style.flexDirection = "column";
+                txRow.style.gap = "4px";
+
+                txRow.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; opacity:0.7;">
+                        <span>ID: <strong>${txId}</strong> &bull; ${timestamp}</span>
+                        <span id="tx-badge-${txId}" style="padding:2px 6px; border-radius:3px; background:rgba(223,183,108,0.1); color:var(--accent-gold); font-weight:700; text-transform:uppercase;">Processing</span>
+                    </div>
+                    <div style="display:flex; justify-content:between; width:100%; font-size:13.5px;">
+                        <span style="flex-grow:1;">✨ Peer-to-Peer Contract: <strong>${itemName}</strong></span>
+                        <span style="color: var(--accent-mint); font-weight:600; margin-left:10px;">Rs. ${computedAmount}</span>
+                    </div>
+                    <div id="tx-timeline-${txId}" style="font-size:11px; color:var(--text-secondary); margin-top:2px; font-style:italic;">
+                        Initiating neighborhood handshake...
+                    </div>
+                `;
+                
+                historyContainer.insertBefore(txRow, historyContainer.firstChild);
+
+                // Stage 1: Security Hold / Escrow State Change
+                setTimeout(() => {
+                    const badge = document.getElementById(`tx-badge-${txId}`);
+                    const timeline = document.getElementById(`tx-timeline-${txId}`);
+                    if(badge) {
+                        badge.innerText = "Escrow Hold";
+                        badge.style.background = "rgba(230,103,103,0.1)";
+                        badge.style.color = "var(--accent-coral)";
+                        timeline.innerHTML = "Funds locked securely in society escrow. Awaiting neighborhood return hand-off confirmation.";
+                    }
+                }, 2000);
+
+                // Stage 2: Completion of Contract State
+                setTimeout(() => {
+                    const badge = document.getElementById(`tx-badge-${txId}`);
+                    const timeline = document.getElementById(`tx-timeline-${txId}`);
+                    if(badge) {
+                        badge.innerText = "Completed";
+                        badge.style.background = "rgba(82,204,163,0.1)";
+                        badge.style.color = "var(--accent-mint)";
+                        timeline.innerHTML = "Item returned safely. Settlement finalized; funds routed into the collective colony pool tracker.";
+                        
+                        // Increment total pool only upon completed security release
+                        runningTotalEarnings += computedAmount;
+                        document.getElementById('ledgerTotalDisplay').innerText = `Rs. ${runningTotalEarnings}`;
+                    }
+                }, 5500);
+            };
+
+            // Enhanced Custom Process Hook to prevent layout button style collisions
+            window.processBoardPurchase = function(btnRef, itemName, priceValue) {
+                if (!activeColonyUserSession) {
+                    triggerAuthModalDisplay();
+                    displayAuthStatusAlert("Identification verification needed before continuous trade engagement.", "err");
+                    return;
+                }
+                window.addTransactionToLedger(itemName, Number(priceValue));
+                
+                btnRef.innerText = "🕒 Escrow Active";
+                btnRef.disabled = true;
+                btnRef.className = "action-button action-button-muted";
+                btnRef.style.cursor = "default";
+                
+                setTimeout(() => {
+                    btnRef.innerText = "✓ Settled";
+                }, 5500);
+            };
+        })();
+
+        /* ========================================================
+           NEW LOGIC ADDON: COMPLETE AUTH SEED CONFIGURATION
+           ======================================================== */
+        let activeColonyUserSession = null;
+        let currentAuthMode = "login";
+        
+        // Hardcoded local registry simulation for close-knit housing networks
+        const mockColonyUserDatabase = {
+            "Flat 402": "sugar123",
+            "House 14": "secure99"
+        };
+
+        function triggerAuthModalDisplay() {
+            document.getElementById('authBackdrop').classList.add('is-visible');
+            clearAuthStatusAlert();
+        }
+
+        function closeAuthModalOverlay(event) {
+            if (event.target.id === 'authBackdrop') {
+                document.getElementById('authBackdrop').classList.remove('is-visible');
+            }
+        }
+
+        function handleAuthNavInteraction() {
+            if (activeColonyUserSession) {
+                // Clear user context session completely on exit hook
+                activeColonyUserSession = null;
+                document.getElementById('navAuthActionButton').innerText = "Access Account";
+                document.getElementById('listingUser').value = "";
+                alert("Flat profile detached successfully.");
+            } else {
+                switchAuthMode('login');
+                triggerAuthModalDisplay();
+            }
+        }
+
+        function switchAuthMode(targetMode) {
+            currentAuthMode = targetMode;
+            clearAuthStatusAlert();
+            
+            const title = document.getElementById('authPanelTitle');
+            const sub = document.getElementById('authPanelSubtitle');
+            const btn = document.getElementById('authSubmitButton');
+            const toggleMsg = document.getElementById('authToggleMessage');
+
+            if (targetMode === 'register') {
+                title.innerText = "Register Profile";
+                sub.innerText = "Establish verified complex destination record";
+                btn.innerText = "Configure Profile Access";
+                toggleMsg.innerHTML = `Registered tenant? <span onclick="switchAuthMode('login')">Return to Colony Login</span>`;
+            } else {
+                title.innerText = "Colony Login";
+                sub.innerText = "Verify your flat location configuration";
+                btn.innerText = "Verify Credentials";
+                toggleMsg.innerHTML = `New to the block? <span onclick="switchAuthMode('register')">Register Flat Profile</span>`;
+            }
+        }
+
+        function displayAuthStatusAlert(text, category) {
+            const el = document.getElementById('authStatusAlert');
+            el.innerText = text;
+            el.className = `auth-status-banner ${category}`;
+            el.style.display = "block";
+        }
+
+        function clearAuthStatusAlert() {
+            const el = document.getElementById('authStatusAlert');
+            el.style.display = "none";
+            el.innerText = "";
+        }
+
+        function executeAuthSubmission(e) {
+            e.preventDefault();
+            const addressInput = document.getElementById('authAddressField').value.trim();
+            const passcode = document.getElementById('authPasscodeField').value;
+
+            if (currentAuthMode === 'login') {
+                if (mockColonyUserDatabase[addressInput] && mockColonyUserDatabase[addressInput] === passcode) {
+                    finalizeAuthSessionSuccess(addressInput);
+                } else {
+                    displayAuthStatusAlert("Invalid identity tracking or mismatched security passcode.", "err");
+                }
+            } else {
+                if (mockColonyUserDatabase[addressInput]) {
+                    displayAuthStatusAlert("Profile address already registered inside network nodes.", "err");
+                } else {
+                    mockColonyUserDatabase[addressInput] = passcode;
+                    finalizeAuthSessionSuccess(addressInput, true);
+                }
+            }
+        }
+
+        function finalizeAuthSessionSuccess(address, wasNewRegistration = false) {
+            activeColonyUserSession = address;
+            document.getElementById('navAuthActionButton').innerText = `Logout (${address})`;
+            document.getElementById('colonyAuthForm').reset();
+            document.getElementById('authBackdrop').classList.remove('is-visible');
+            
+            populateAutofillAddressFields();
+            
+            setTimeout(() => {
+                alert(wasNewRegistration ? `Profile address [${address}] linked successfully!` : `Identity confirmed. Welcome back, neighbor from ${address}!`);
+            }, 300);
+        }
+
+        function populateAutofillAddressFields() {
+            if (activeColonyUserSession) {
+                document.getElementById('listingUser').value = activeColonyUserSession;
+            }
+        }
+    </script>
+
+</body>
+</html>
